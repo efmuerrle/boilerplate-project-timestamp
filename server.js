@@ -22,31 +22,32 @@ app.get('/', function(req, res) {
 app.get('/api/timestamp', function(req, res) {
   const date = new Date();
   // console.log('date', date);
-  res.json({ unix: null, utc: date });
+  res.json({ unix: date.getTime(), utc: date.toUTCString() });
 });
 
 app.get('/api/timestamp/:date_string', function(req, res, next) {
-  const response = {};
+  let response = {};
   //1. Check if the input is valid
   const date = getValidFormat(req.params.date_string);
   // console.log('date', date);
   //2. If date is valid, return the modified response object
   if (date) {
-    response.unix = date.getTime() / 1000;
+    response.unix = date.getTime();
     response.utc = date.toUTCString();
   }
   //3. Else return invalid response object
   else {
-    response.unix = null;
-    response.utc = 'Invalid Date';
+    // response.unix = null;
+    // response.utc = 'Invalid Date';
+    response = { error: 'Invalid Date' };
   }
 
   res.json(response);
 });
 
 // listen for requests :)
-var listener = app.listen(process.env.PORT, function() {
-  // var listener = app.listen(5555, function() {
+// var listener = app.listen(process.env.PORT, function() {
+var listener = app.listen(5555, function() {
   console.log('Your app is listening on port ' + listener.address().port);
 });
 
@@ -55,7 +56,7 @@ const getValidFormat = value => {
   const dateOption = new Date(value * 1000);
   if (date == 'Invalid Date') {
     if (dateOption != 'Invalid Date') {
-      return date;
+      return dateOption;
     }
     return false;
   }
